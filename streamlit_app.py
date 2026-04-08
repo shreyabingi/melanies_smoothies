@@ -1,18 +1,25 @@
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
+import snowflake.connector
+
+# Snowflake connection (use secrets)
+conn = snowflake.connector.connect(
+    user=st.secrets["user"],
+    password=st.secrets["password"],
+    account=st.secrets["account"],
+    warehouse=st.secrets["warehouse"],
+    database=st.secrets["database"],
+    schema=st.secrets["schema"]
+)
+
+cur = conn.cursor()
 
 # Title
 st.title("Customize your Smoothie 🎈")
 
-# Get Snowflake session
-session = get_active_session()
+# Load fruits from Snowflake
+cur.execute("SELECT FRUIT_NAME FROM SMOOTHIES.PUBLIC.FRUIT_OPTIONS")
 
-# Load fruit list
-fruit_df = session.table("SMOOTHIES.PUBLIC.FRUIT_OPTIONS")
-
-fruit_list = fruit_df.select("FRUIT_NAME") \
-                     .to_pandas()["FRUIT_NAME"] \
-                     .tolist()
+fruit_list = [row[0] for row in cur.fetchall()]
 
 # Name input
 name_on_order = st.text_input("Name on Order")
@@ -41,13 +48,14 @@ if st.button("Submit Order"):
 
     else:
 
-        insert_stmt = f"""
-            insert into smoothies.public.orders
-            (ingredients, name_on_order)
-            values ('{ingredients_string}', '{name_on_order}')
+        insert_sql = f"""
+        INSERT INTO SMOOTHIES.PUBLIC.ORDERS
+        (INGREDIENTS, NAME_ON_ORDER)
+        VALUES ('{ingredients_string}', '{name_on_order}')
         """
 
-        session.sql(insert_stmt).collect()
+        cur.execute(insert_sql)
+        conn.commit()
 
         st.success(
             f"Your Smoothie for {name_on_order} is ordered! ✅"
