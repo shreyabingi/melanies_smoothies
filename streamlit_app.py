@@ -1,22 +1,21 @@
 import streamlit as st
-from snowflake. snowpark. functions import col
+
 # Title
-st.title("Customize your Smoothie :balloon:")
+st.title("Customize your Smoothie 🎈")
 
-# Snowflake session
-session = get_active_session()
-
-# Load fruit table
-fruit_df = session.table(
-    "SMOOTHIES.PUBLIC.FRUIT_OPTIONS"
-)
-
-fruit_list = (
-    fruit_df
-    .select("FRUIT_NAME")
-    .to_pandas()["FRUIT_NAME"]
-    .tolist()
-)
+# Local fruit list (instead of Snowflake table)
+fruit_list = [
+    "Apple",
+    "Banana",
+    "Blueberries",
+    "Strawberries",
+    "Mango",
+    "Kiwi",
+    "Dragon Fruit",
+    "Guava",
+    "Figs",
+    "Cantaloupe"
+]
 
 # Name input
 name_on_order = st.text_input("Name on Order")
@@ -36,11 +35,6 @@ ingredients_list = st.multiselect(
     max_selections=5
 )
 
-# Extra safety validation
-if len(ingredients_list) > 5:
-    st.error("Please select no more than 5 fruits.")
-    st.stop()
-
 # Convert list to string
 ingredients_string = ", ".join(ingredients_list)
 
@@ -59,24 +53,6 @@ if st.button("Submit Order"):
         st.error("Please choose ingredients.")
 
     else:
-
-        # Escape single quotes (important)
-        safe_name = name_on_order.replace("'", "''")
-
-        my_insert_stmt = f"""
-        insert into smoothies.public.orders
-        (ingredients, name_on_order)
-        values ('{ingredients_string}', '{safe_name}')
-        """
-
-        # Debug output
-        st.write("Running SQL:")
-        st.code(my_insert_stmt)
-
-        # Execute insert
-        session.sql(my_insert_stmt).collect()
-
         st.success(
-            f"Your Smoothie for {name_on_order} is ordered!",
-            icon="✅"
+            f"Your Smoothie for {name_on_order} is ordered! ✅"
         )
