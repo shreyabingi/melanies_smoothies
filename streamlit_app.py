@@ -23,12 +23,12 @@ fruit_list = [
 name_on_order = st.text_input("Name on Order")
 
 # Favorite fruit dropdown
-option = st.selectbox(
-    "What is your favourite fruit?",
-    fruit_list
-)
+# option = st.selectbox(
+#     "What is your favourite fruit?",
+#     fruit_list
+# )
 
-st.write("Your favourite fruit is:", option)
+# st.write("Your favourite fruit is:", option)
 
 # Multi-select ingredients
 ingredients_list = st.multiselect(
