@@ -1,7 +1,7 @@
 import streamlit as st
 import snowflake.connector
 
-# Snowflake connection (use secrets)
+# Snowflake connection
 conn = snowflake.connector.connect(
     user=st.secrets["user"],
     password=st.secrets["password"],
@@ -16,7 +16,7 @@ cur = conn.cursor()
 # Title
 st.title("Customize your Smoothie 🎈")
 
-# Load fruits from Snowflake
+# Load fruits
 cur.execute("SELECT FRUIT_NAME FROM SMOOTHIES.PUBLIC.FRUIT_OPTIONS")
 
 fruit_list = [row[0] for row in cur.fetchall()]
@@ -31,10 +31,9 @@ ingredients_list = st.multiselect(
     max_selections=5
 )
 
-# Sort ingredients before joining
-ingredients_list_sorted = sorted(ingredients_list)
+# Keep selection order (NO sorting)
+ingredients_string = ", ".join(ingredients_list)
 
-ingredients_string = ", ".join(ingredients_list_sorted)
 if ingredients_string:
     st.write("Your smoothie will contain:")
     st.write(ingredients_string)
