@@ -31,8 +31,10 @@ ingredients_list = st.multiselect(
     max_selections=5
 )
 
-ingredients_string = ", ".join(ingredients_list)
+# Sort ingredients before joining
+ingredients_list_sorted = sorted(ingredients_list)
 
+ingredients_string = ", ".join(ingredients_list_sorted)
 if ingredients_string:
     st.write("Your smoothie will contain:")
     st.write(ingredients_string)
